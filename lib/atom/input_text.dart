@@ -20,6 +20,8 @@ class InputTextController {
   // state
   String _text = '';
 
+  String get text => this._text;
+
   InputTextController({
     this.isAutoValidation = true,
     String Function(String text) validator,
@@ -34,7 +36,7 @@ class InputTextController {
   }
 
   // textFieldに文字をセットします
-  void setText(String text) {
+  void setField(String text) {
     this.changeText(text);
     final textEditingController = TextEditingController(text: text);
     textEditingController.selection =

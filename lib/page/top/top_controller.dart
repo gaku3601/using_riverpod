@@ -16,7 +16,7 @@ class TopController extends StateNotifier<TopState> {
       onChanged: (val) => _top.onTextChange(val),
       validator: (val) => _top.textValidation(val),
     );
-    _top.inputTextController.setText('init text');
+    _top.inputTextController.setField('init text');
     return _top;
   }
 
@@ -36,11 +36,12 @@ class TopController extends StateNotifier<TopState> {
       print('errroがあるよ！');
       return;
     }
+    print(this.inputTextController.text);
     print('登録完了！');
   }
 
   void reset() {
-    this.inputTextController.setText('resetText');
+    this.inputTextController.setField('resetText');
   }
 
   void increment() => state = state.copyWith(count: state.count + 1);
