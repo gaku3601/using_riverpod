@@ -6,6 +6,7 @@ import 'package:using_riverpod/atom/base.dart';
 import 'package:using_riverpod/atom/button.dart';
 import 'package:using_riverpod/atom/input_text.dart';
 import 'package:using_riverpod/atom/label.dart';
+import 'package:using_riverpod/page/second/second_page.dart';
 import 'package:using_riverpod/page/top/top_controller.dart';
 
 class TopPage extends HookWidget {
@@ -31,6 +32,18 @@ class TopPage extends HookWidget {
           ),
           Button('登録', onPressed: () => provider.register()),
           Button('リセット', onPressed: () => provider.reset()),
+          Button(
+            '遷移',
+            onPressed: () {
+              Navigator.of(context).pushReplacement(
+                MaterialPageRoute(
+                  builder: (context) {
+                    return SecondPage();
+                  },
+                ),
+              );
+            },
+          )
         ],
       ),
     );

@@ -3,15 +3,15 @@ import 'package:state_notifier/state_notifier.dart';
 import 'package:using_riverpod/atom/input_text.dart';
 import 'package:using_riverpod/page/top/state/top_state.dart';
 
-final topProvider = StateNotifierProvider((_) => TopController());
+final topProvider = StateNotifierProvider.autoDispose((_) => TopController());
 
 class TopController extends StateNotifier<TopState> {
   InputTextController inputTextController;
 
-  TopController._internal() : super(TopState());
+  TopController._() : super(TopState());
 
   factory TopController() {
-    TopController _top = TopController._internal();
+    TopController _top = TopController._();
     _top.inputTextController = InputTextController(
       onChanged: (val) => _top.onTextChange(val),
       validator: (val) => _top.textValidation(val),
