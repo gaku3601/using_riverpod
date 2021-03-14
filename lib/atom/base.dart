@@ -8,8 +8,21 @@ class Base extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: SafeArea(child: this.body),
+    return GestureDetector(
+      onTap: () {
+        // カーソルをはずす処理
+        final FocusScopeNode currentScope = FocusScope.of(context);
+        if (!currentScope.hasPrimaryFocus && currentScope.hasFocus) {
+          FocusManager.instance.primaryFocus.unfocus();
+        }
+      },
+      child: Scaffold(
+        body: SafeArea(
+          child: SingleChildScrollView(
+            child: this.body,
+          ),
+        ),
+      ),
     );
   }
 }

@@ -29,7 +29,8 @@ class TopPage extends HookWidget {
             label: 'label',
             placeholder: 'place',
           ),
-          Button('validate!', onPressed: () => provider.register()),
+          Button('登録', onPressed: () => provider.register()),
+          Button('リセット', onPressed: () => provider.reset()),
         ],
       ),
     );

@@ -9,45 +9,50 @@ class InputTextController {
   final Function(String text) onChanged;
 
   // controller
-  final _textController = StreamController<String>();
+  final _setTextController = StreamController<TextEditingController>();
   final _errorController = StreamController<String>();
-
-  // state
-  String text;
-
-  // 入力
-  Function get setText => _textController.sink.add;
 
   // 出力
   Stream<String> get onError => this._errorController.stream;
 
+  Stream<TextEditingController> get onSetText => this._setTextController.stream;
+
+  // state
+  String _text = '';
+
   InputTextController({
-    this.text = '',
     this.isAutoValidation = true,
     String Function(String text) validator,
     Function(String text) onChanged,
   })  : this.validator = validator ?? ((String value) => null),
-        this.onChanged = onChanged ?? ((String value) {}) {
-    _textController.stream.listen((String val) => this._onChangeText(val));
-  }
+        this.onChanged = onChanged ?? ((String value) {});
 
   // バリデーション処理
   bool onValidation() {
-    this._errorController.sink.add(this.validator(this.text));
-    return this.validator(this.text) != null;
+    this._errorController.sink.add(this.validator(this._text));
+    return this.validator(this._text) != null;
+  }
+
+  // textFieldに文字をセットします
+  void setText(String text) {
+    this.changeText(text);
+    final textEditingController = TextEditingController(text: text);
+    textEditingController.selection =
+        TextSelection.collapsed(offset: text.length);
+    _setTextController.sink.add(textEditingController);
   }
 
   // text変更処理
-  void _onChangeText(String text) {
-    this.text = text;
-    this.onChanged(this.text);
+  void changeText(String text) {
+    this._text = text;
+    this.onChanged(this._text);
     if (this.isAutoValidation) {
       this.onValidation();
     }
   }
 
   void dispose() {
-    this._textController.close();
+    this._setTextController.close();
     this._errorController.close();
   }
 }
@@ -65,12 +70,9 @@ class InputText extends StatefulWidget {
 }
 
 class _InputTextState extends State<InputText> {
-  TextEditingController _controller;
-
   @override
   void initState() {
     super.initState();
-    this._controller = TextEditingController(text: this.widget.controller.text);
   }
 
   @override
@@ -78,18 +80,23 @@ class _InputTextState extends State<InputText> {
     return Container(
       child: StreamBuilder<String>(
         stream: this.widget.controller.onError,
-        builder: (context, snapshot) {
-          return TextField(
-            controller: this._controller,
-            onChanged: (String value) {
-              this.widget.controller.setText(value);
+        builder: (context, error) {
+          return StreamBuilder<TextEditingController>(
+            stream: this.widget.controller.onSetText,
+            builder: (context, text) {
+              return TextField(
+                controller: text.data,
+                onChanged: (String value) {
+                  this.widget.controller.changeText(value);
+                },
+                decoration: InputDecoration(
+                  border: OutlineInputBorder(),
+                  labelText: this.widget.label,
+                  hintText: this.widget.placeholder,
+                  errorText: error.data,
+                ),
+              );
             },
-            decoration: InputDecoration(
-              border: OutlineInputBorder(),
-              labelText: this.widget.label,
-              hintText: this.widget.placeholder,
-              errorText: snapshot.data,
-            ),
           );
         },
       ),

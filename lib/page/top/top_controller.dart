@@ -16,6 +16,7 @@ class TopController extends StateNotifier<TopState> {
       onChanged: (val) => _top.onTextChange(val),
       validator: (val) => _top.textValidation(val),
     );
+    _top.inputTextController.setText('init text');
     return _top;
   }
 
@@ -36,6 +37,10 @@ class TopController extends StateNotifier<TopState> {
       return;
     }
     print('登録完了！');
+  }
+
+  void reset() {
+    this.inputTextController.setText('resetText');
   }
 
   void increment() => state = state.copyWith(count: state.count + 1);

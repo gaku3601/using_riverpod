@@ -9,7 +9,10 @@ class Button extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ElevatedButton(
-      onPressed: this.onPressed,
+      onPressed: () {
+        FocusScope.of(context).requestFocus(FocusNode()); // フォーカスをはずす
+        this.onPressed();
+      },
       child: Text(this.text),
     );
   }
