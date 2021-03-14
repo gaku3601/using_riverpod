@@ -9,7 +9,6 @@ class InputTextController {
   final Function(String text) onChanged;
 
   // controller
-  final _validationController = StreamController<void>();
   final _textController = StreamController<String>();
   final _errorController = StreamController<String>();
 
@@ -18,8 +17,6 @@ class InputTextController {
 
   // 入力
   Function get setText => _textController.sink.add;
-
-  Function get validation => () => this._validationController.sink.add(null);
 
   // 出力
   Stream<String> get onError => this._errorController.stream;
@@ -31,13 +28,13 @@ class InputTextController {
     Function(String text) onChanged,
   })  : this.validator = validator ?? ((String value) => null),
         this.onChanged = onChanged ?? ((String value) {}) {
-    _validationController.stream.listen((_) => this._onValidation());
     _textController.stream.listen((String val) => this._onChangeText(val));
   }
 
   // バリデーション処理
-  void _onValidation() {
+  bool onValidation() {
     this._errorController.sink.add(this.validator(this.text));
+    return this.validator(this.text) != null;
   }
 
   // text変更処理
@@ -45,12 +42,11 @@ class InputTextController {
     this.text = text;
     this.onChanged(this.text);
     if (this.isAutoValidation) {
-      this._onValidation();
+      this.onValidation();
     }
   }
 
   void dispose() {
-    this._validationController.close();
     this._textController.close();
     this._errorController.close();
   }

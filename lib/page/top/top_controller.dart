@@ -6,18 +6,37 @@ import 'package:using_riverpod/page/top/state/top_state.dart';
 final topProvider = StateNotifierProvider((_) => TopController());
 
 class TopController extends StateNotifier<TopState> {
-  TopController() : super(TopState());
+  InputTextController inputTextController;
 
-  String textValidation(String val) {
-    if (val.isEmpty)
+  TopController._internal() : super(TopState());
+
+  factory TopController() {
+    TopController _top = TopController._internal();
+    _top.inputTextController = InputTextController(
+      onChanged: (val) => _top.onTextChange(val),
+      validator: (val) => _top.textValidation(val),
+    );
+    return _top;
+  }
+
+  void onTextChange(String text) {
+    print('changed: $text');
+  }
+
+  String textValidation(String text) {
+    if (text.isEmpty)
       return '入力しろ！';
     else
       return null;
   }
 
-  void myPrint(String text) {
-    print(text);
+  void register() {
+    if (this.inputTextController.onValidation()) {
+      print('errroがあるよ！');
+      return;
+    }
+    print('登録完了！');
   }
 
-  increment() => state = state.copyWith(count: state.count + 1);
+  void increment() => state = state.copyWith(count: state.count + 1);
 }

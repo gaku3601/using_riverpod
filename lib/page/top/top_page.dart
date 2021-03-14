@@ -13,18 +13,6 @@ class TopPage extends HookWidget {
   Widget build(BuildContext context) {
     final provider = useProvider(topProvider);
     final state = useProvider(topProvider.state);
-    final inputTextController = InputTextController(
-      isAutoValidation: false,
-      onChanged: (val) {
-        print(val);
-      },
-      validator: (val) {
-        if (val.isEmpty)
-          return '入力しろ！';
-        else
-          return null;
-      },
-    );
     return Base(
       body: Column(
         children: [
@@ -37,13 +25,11 @@ class TopPage extends HookWidget {
             },
           ),
           InputText(
-            controller: inputTextController,
+            controller: provider.inputTextController,
             label: 'label',
             placeholder: 'place',
           ),
-          Button('validate!', onPressed: () {
-            inputTextController.validation();
-          }),
+          Button('validate!', onPressed: () => provider.register()),
         ],
       ),
     );
