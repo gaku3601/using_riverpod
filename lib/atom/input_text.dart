@@ -1,6 +1,16 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:using_riverpod/util/stream_util.dart';
+
+class Error extends StreamEvent {
+  Error(String error) : super(error);
+}
+
+class TextEditing extends StreamEvent {
+  TextEditing(TextEditingController textEditingController)
+      : super(textEditingController);
+}
 
 class InputTextController {
   // prop
@@ -9,13 +19,10 @@ class InputTextController {
   final Function(String text) onChanged;
 
   // controller
-  final _setTextController = StreamController<TextEditingController>();
-  final _errorController = StreamController<String>();
+  final _controller = StreamController<StreamEvent>();
 
   // 出力
-  Stream<String> get onError => this._errorController.stream;
-
-  Stream<TextEditingController> get onSetText => this._setTextController.stream;
+  Stream<StreamEvent> get output => this._controller.stream;
 
   // state
   String _text = '';
@@ -31,7 +38,7 @@ class InputTextController {
 
   // バリデーション処理
   bool onValidation() {
-    this._errorController.sink.add(this.validator(this._text));
+    this._controller.sink.add(Error(this.validator(this._text)));
     return this.validator(this._text) != null;
   }
 
@@ -41,7 +48,7 @@ class InputTextController {
     final textEditingController = TextEditingController(text: text);
     textEditingController.selection =
         TextSelection.collapsed(offset: text.length);
-    _setTextController.sink.add(textEditingController);
+    _controller.sink.add(TextEditing(textEditingController));
   }
 
   // text変更処理
@@ -54,8 +61,7 @@ class InputTextController {
   }
 
   void dispose() {
-    this._setTextController.close();
-    this._errorController.close();
+    this._controller.close();
   }
 }
 
@@ -80,25 +86,20 @@ class _InputTextState extends State<InputText> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      child: StreamBuilder<String>(
-        stream: this.widget.controller.onError,
-        builder: (context, error) {
-          return StreamBuilder<TextEditingController>(
-            stream: this.widget.controller.onSetText,
-            builder: (context, text) {
-              return TextField(
-                controller: text.data,
-                onChanged: (String value) {
-                  this.widget.controller.changeText(value);
-                },
-                decoration: InputDecoration(
-                  border: OutlineInputBorder(),
-                  labelText: this.widget.label,
-                  hintText: this.widget.placeholder,
-                  errorText: error.data,
-                ),
-              );
+      child: StreamBuilder<StreamEvent>(
+        stream: this.widget.controller.output,
+        builder: (context, snapshot) {
+          return TextField(
+            controller: snapshot.data?.returnValue<TextEditing>(),
+            onChanged: (String value) {
+              this.widget.controller.changeText(value);
             },
+            decoration: InputDecoration(
+              border: OutlineInputBorder(),
+              labelText: this.widget.label,
+              hintText: this.widget.placeholder,
+              errorText: snapshot.data?.returnValue<Error>(),
+            ),
           );
         },
       ),

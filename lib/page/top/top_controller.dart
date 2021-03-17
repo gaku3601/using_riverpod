@@ -3,6 +3,7 @@ import 'package:state_notifier/state_notifier.dart';
 import 'package:using_riverpod/atom/input_text.dart';
 import 'package:using_riverpod/page/top/state/top_state.dart';
 
+// TODO: autoDisposeをつけなくても良い方法をさぐる
 final topProvider = StateNotifierProvider.autoDispose((_) => TopController());
 
 class TopController extends StateNotifier<TopState> {
@@ -11,6 +12,7 @@ class TopController extends StateNotifier<TopState> {
   TopController._() : super(TopState());
 
   factory TopController() {
+    // もしくはinit methodを作ってそこでcontrollerに値をセットする
     TopController _top = TopController._();
     _top.inputTextController = InputTextController(
       onChanged: (val) => _top.onTextChange(val),
