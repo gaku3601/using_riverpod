@@ -3,7 +3,6 @@ import 'package:state_notifier/state_notifier.dart';
 import 'package:using_riverpod/atom/input_text.dart';
 import 'package:using_riverpod/page/top/state/top_state.dart';
 
-// TODO: autoDisposeをつけなくても良い方法をさぐる
 final topProvider = StateNotifierProvider.autoDispose((_) => TopController());
 
 class TopController extends StateNotifier<TopState> {

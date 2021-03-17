@@ -3,13 +3,20 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:using_riverpod/util/stream_util.dart';
 
-class Error extends StreamEvent {
-  Error(String error) : super(error);
+class ErrorEvent extends StreamEvent {
+  ErrorEvent(String error) : super(error);
 }
 
-class TextEditing extends StreamEvent {
-  TextEditing(TextEditingController textEditingController)
+class SetTextFieldEvent extends StreamEvent {
+  SetTextFieldEvent._(TextEditingController textEditingController)
       : super(textEditingController);
+
+  factory SetTextFieldEvent(String text) {
+    TextEditingController controller = TextEditingController(text: text);
+    controller.selection = TextSelection.collapsed(offset: text.length);
+
+    return SetTextFieldEvent._(controller);
+  }
 }
 
 class InputTextController {
@@ -38,17 +45,14 @@ class InputTextController {
 
   // バリデーション処理
   bool onValidation() {
-    this._controller.sink.add(Error(this.validator(this._text)));
+    this._controller.sink.add(ErrorEvent(this.validator(this._text)));
     return this.validator(this._text) != null;
   }
 
   // textFieldに文字をセットします
   void setField(String text) {
     this.changeText(text);
-    final textEditingController = TextEditingController(text: text);
-    textEditingController.selection =
-        TextSelection.collapsed(offset: text.length);
-    _controller.sink.add(TextEditing(textEditingController));
+    _controller.sink.add(SetTextFieldEvent(text));
   }
 
   // text変更処理
@@ -90,7 +94,7 @@ class _InputTextState extends State<InputText> {
         stream: this.widget.controller.output,
         builder: (context, snapshot) {
           return TextField(
-            controller: snapshot.data?.returnValue<TextEditing>(),
+            controller: snapshot.data?.returnValue<SetTextFieldEvent>(),
             onChanged: (String value) {
               this.widget.controller.changeText(value);
             },
@@ -98,7 +102,7 @@ class _InputTextState extends State<InputText> {
               border: OutlineInputBorder(),
               labelText: this.widget.label,
               hintText: this.widget.placeholder,
-              errorText: snapshot.data?.returnValue<Error>(),
+              errorText: snapshot.data?.returnValue<ErrorEvent>(),
             ),
           );
         },
