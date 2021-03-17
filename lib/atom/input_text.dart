@@ -112,7 +112,7 @@ class _InputTextState extends State<InputText> {
 
   @override
   void dispose() {
-    super.dispose();
     this.widget.controller.dispose();
+    super.dispose();
   }
 }
