@@ -15,6 +15,7 @@ class TopPage extends HookWidget {
     final provider = useProvider(topProvider);
     final state = useProvider(topProvider.state);
     return Base(
+      controller: provider.baseController,
       body: Column(
         children: [
           Label('counter'),
@@ -32,6 +33,7 @@ class TopPage extends HookWidget {
           ),
           Button('登録', onPressed: () => provider.register()),
           Button('リセット', onPressed: () => provider.reset()),
+          Button('ローディング', onPressed: () => provider.startLoading()),
           Button(
             '遷移',
             onPressed: () {

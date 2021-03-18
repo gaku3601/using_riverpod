@@ -1,5 +1,6 @@
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:state_notifier/state_notifier.dart';
+import 'package:using_riverpod/atom/base.dart';
 import 'package:using_riverpod/atom/input_text.dart';
 import 'package:using_riverpod/page/top/state/top_state.dart';
 
@@ -7,6 +8,7 @@ final topProvider = StateNotifierProvider.autoDispose((_) => TopController());
 
 class TopController extends StateNotifier<TopState> {
   InputTextController inputTextController;
+  BaseController baseController;
 
   TopController._() : super(TopState());
 
@@ -18,7 +20,14 @@ class TopController extends StateNotifier<TopState> {
       validator: (val) => _top.textValidation(val),
     );
     _top.inputTextController.setField('init text');
+    _top.baseController = BaseController();
     return _top;
+  }
+
+  void startLoading() async {
+    this.baseController.onStartLoading();
+    await new Future.delayed(new Duration(seconds: 3));
+    this.baseController.onEndLoading();
   }
 
   void onTextChange(String text) {
