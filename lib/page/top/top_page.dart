@@ -34,6 +34,7 @@ class TopPage extends HookWidget {
           Button('登録', onPressed: () => provider.register()),
           Button('リセット', onPressed: () => provider.reset()),
           Button('ローディング', onPressed: () => provider.startLoading()),
+          Button('スナックバー', onPressed: () => provider.displaySnackbar()),
           Button(
             '遷移',
             onPressed: () {

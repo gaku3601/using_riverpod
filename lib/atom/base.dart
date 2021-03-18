@@ -8,9 +8,13 @@ class LoadingEvent extends StreamEvent {
   LoadingEvent(bool isLoading) : super(isLoading);
 }
 
+class SnackbarEvent extends StreamEvent {
+  SnackbarEvent(SnackBar snackBar) : super(snackBar);
+}
+
 class BaseController {
   // controller
-  final _controller = StreamController<StreamEvent>();
+  final _controller = StreamController<StreamEvent>.broadcast();
 
   // 出力
   Stream<StreamEvent> get output => this._controller.stream;
@@ -23,6 +27,11 @@ class BaseController {
   // loading処理
   void onEndLoading() {
     this._controller.sink.add(LoadingEvent(false));
+  }
+
+  // snackbar表示
+  void onSnackbar(SnackBar snackBar) {
+    this._controller.sink.add(SnackbarEvent(snackBar));
   }
 
   void dispose() {
@@ -42,6 +51,17 @@ class Base extends StatefulWidget {
 }
 
 class _BaseState extends State<Base> {
+  @override
+  void initState() {
+    super.initState();
+    this.widget.controller.output.listen((event) {
+      if (event is SnackbarEvent) {
+        ScaffoldMessenger.of(context)
+            .showSnackBar(event.returnValue<SnackbarEvent>());
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return GestureDetector(

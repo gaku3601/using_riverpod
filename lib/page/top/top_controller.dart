@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:state_notifier/state_notifier.dart';
 import 'package:using_riverpod/atom/base.dart';
@@ -32,6 +33,19 @@ class TopController extends StateNotifier<TopState> {
 
   void onTextChange(String text) {
     print('changed: $text');
+  }
+
+  void displaySnackbar() {
+    this.baseController.onSnackbar(SnackBar(
+        content: Text('test'),
+        action: SnackBarAction(
+          label: 'test',
+          onPressed: this.snackbarAction,
+        )));
+  }
+
+  void snackbarAction() {
+    print('action!');
   }
 
   String textValidation(String text) {
